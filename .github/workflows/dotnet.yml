@@ -1,7 +1,4 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: CI/CD Pipeline
 
 on:
   push:
@@ -9,20 +6,44 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  DOCKER_COMPOSE_VERSION: v2.24.5
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  PROJECT_DIR: "/home/gleb/NVPN.Host"
+
 jobs:
-  build:
-
+  build_and_test:
+    name: Build and Test
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Use .NET 8.0 (LTS) instead of 9.x
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+
+    # Backend build and test
+    - name: Build and test backend
+      run: |
+        find . -name "*.csproj" -not -path "*/nvpn-host-client/*" -exec dotnet restore {} \;
+        find . -name "*.csproj" -not -path "*/nvpn-host-client/*" -exec dotnet build {} --configuration Release --no-restore \;
+        find . -name "*.csproj" -not -path "*/nvpn-host-client/*" -exec dotnet test {} --verbosity normal \;
+
+    # Frontend setup
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: 'nvpn-host-client/package-lock.json'
+
+    - name: Install and build frontend
+      working-directory: ./nvpn-host-client
+      run: |
+        npm ci --no-audit
+        npm run build
+        npm run lint --if-present
+        npm test --if-present
