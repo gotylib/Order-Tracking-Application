@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Order Tracking Application"
+    />
+    <title>Order Tracking Application</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script>
+      // Простая проверка, что JavaScript работает
+      console.log('HTML loaded, JavaScript is working');
+      window.addEventListener('error', function(e) {
+        console.error('Global error:', e.error, e.message, e.filename, e.lineno);
+        document.getElementById('root').innerHTML = '<div style="padding: 20px; text-align: center;"><h1>Ошибка JavaScript</h1><p>' + e.message + '</p><p>Файл: ' + e.filename + ':' + e.lineno + '</p></div>';
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled promise rejection:', e.reason);
+      });
+    </script>
+  </body>
+</html>

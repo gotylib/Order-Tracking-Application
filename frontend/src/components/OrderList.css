@@ -1,0 +1,9 @@
+.order-list {
+  width: 100%;
+}
+
+.orders-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
