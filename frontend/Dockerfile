@@ -16,8 +16,10 @@ COPY package*.json ./
 # Установка зависимостей
 RUN npm install
 
-# Копирование исходного кода
-COPY . .
+# Копирование исходного кода (node_modules исключается через .dockerignore)
+COPY src ./src
+COPY public ./public
+COPY tsconfig.json ./
 
 # Сборка приложения
 RUN npm run build
